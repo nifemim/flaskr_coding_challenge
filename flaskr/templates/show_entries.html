@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      <dl>
+        <fieldset>
+        <legend>Personal Information</legend>
+        <dt> First Name:
+        <dd><input type="text" name="firstname">
+        <dt> Last Name:
+        <dd><input type="text" name="lastname">
+        <dt> Email Adress:
+        <dd><input type="text" name="email">
+        </fieldset>
+        <br>
+        <fieldset>
+        <legend>Charity Information</legend>
+        <dt> Affiliated Charity:
+        <dd><input type="radio" name="charity" value="alzheimers">Alzheimer's Association
+        <dd><input type="radio" name="charity" value="cancersociety">American Cancer Society
+        <dd><input type="radio" name="charity" value="amredcross">American Red Cross
+        <dt> Tell Us About Your Charity Experience:
+        <dd><textarea name="about" rows="5" cols="40"></textarea>
+        </fieldset>
+        <br>
+        <dd><input type="submit" value="Share">
+      </dl>
+    </form>
+  {% endif %}
+  <ul class="entries">
+  {% for entry in entries %}
+    <li><h2><a href="{{ url_for('collaborator', entry) }}"> {{ entry.firstname } { entry.lastname }} </a></h2>{{entry.charity}}
+  {% else %}
+    <li><em>Unbelievable.  No entries here so far.</em>
+  {% endfor %}
+  </ul>
+{% endblock %}

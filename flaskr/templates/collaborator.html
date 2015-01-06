@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if collaborator_info %}
+  	<h2>{{ collaborator_info.firstname } { collaborator_info.lastname }}</h2>
+  	<br>
+  	<h3><strong>Affiliated Charity</strong>{{ collaborator_info.charity }}</h3>
+  	<br>
+  	<h3><strong>About</strong></h3>
+  	<p>{{ collaborator_info.about }}</p>
+  	<br>
+  	<h3><strong>Try contacting this possible collaborator by their email! </strong></h3>
+  	<p>{{ collaborator_info.email }}</p>
+  {% else %}
+  	<p class=error><strong>Error:</strong> It seems this collaborator isn't in our databse. Strange...
+  {% endif %}
+  
+{% endblock %}
