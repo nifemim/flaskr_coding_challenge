@@ -1,18 +1,20 @@
 # all the imports
+import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing
 
+# creating our application
+app = Flask(__name__)
+
 # configuration
-DATABASE = '/tmp/flaskr.db'
+DATABASE = os.path.join(app.root_path, 'flaskr.db')
 DEBUG = True
-SECRET_KEY = 'nifemi_flaskr_test_2015'
+SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
 
-# creating our application
-app = Flask(__name__)
 app.config.from_object(__name__)
 
 # to be able to connect to our database so we can open connections on request
@@ -25,10 +27,19 @@ def init_db():
         with app.open_resource('schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
         db.commit()
+    print('Successfully initialized the database.')
 
 @app.before_request
 def before_request():
     g.db = connect_db()
+    cur = g.db.execute('select firstname, lastname, charity, about, email from entries order by id desc')
+    if cur.fetchall():
+        g.db.execute('update entries set hitcount = hitcount + 1 where (firstname = "Hitcount") and (lastname = "Initializer")')
+        g.db.commit()
+    else:
+        g.db.execute('insert into entries (firstname, lastname, hitcount) values (?, ?, ?)', ["Hitcount", "Initializer", 1])
+        g.db.commit()
+
 
 @app.teardown_request
 def teardown_request(exception):
@@ -80,11 +91,12 @@ def logout():
 @app.route('/collaborator')
 def collaborator(entry_info):
     collaborator_info = None
-    cur = g.db.execute('select firstname, lastname, charity, about from entries order by id desc')
+    cur = g.db.execute('select firstname, lastname, charity, about from entries order by id desc where (firstname <> "Hitcount") and (lastname <> "Initializer")')
     entries = [dict(firstname=row[0], lastname=row[1], charity=row[2], about=row[3]) for row in cur.fetchall()]
     for e in entries:
         if e['firstname'] == entry_info['firstname'] and e['lastname'] == entry_info['lastname']:
             collaborator_info = e
+            break
     return render_template('collaborator.html', collaborator_info=collaborator_info)
 
 # running the server if this program is being run by itself

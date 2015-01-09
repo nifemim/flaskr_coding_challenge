@@ -5,5 +5,6 @@ create table entries (
   lastname text not null,
   charity text not null,
   about text not null,
-  email text not null
+  email text not null,
+  hitcount integer
 );

@@ -27,11 +27,18 @@
       </dl>
     </form>
   {% endif %}
+  
+  {% for entry in entries %}
+    {% if entry.firstname = "Hitcounter" and entry.lastname = "Initializer" %}
+      <h2>Website Views So Far:</h2>{{ entry.hitcount }}
+    {% endif %}
+  {% endfor %}
+
   <ul class="entries">
   {% for entry in entries %}
-    <li><h2><a href="{{ url_for('collaborator', entry) }}"> {{ entry.firstname } { entry.lastname }} </a></h2>{{entry.charity}}
-  {% else %}
-    <li><em>Unbelievable.  No entries here so far.</em>
+    {% if entry.firstname != "Hitcounter" and entry.lastname != "Initializer" %}
+      <li><h2><a href="{{ url_for('collaborator', entry) }}"> {{ entry.firstname } { entry.lastname }} </a></h2>{{entry.charity}}
+    {% endif %}
   {% endfor %}
   </ul>
 {% endblock %}
