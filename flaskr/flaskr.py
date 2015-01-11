@@ -32,14 +32,10 @@ def init_db():
 @app.before_request
 def before_request():
     g.db = connect_db()
-    cur = g.db.execute('select firstname, lastname, charity, about, email from entries order by id desc')
-    if cur.fetchall():
-        g.db.execute('update entries set hitcount = hitcount + 1 where (firstname = "Hitcount") and (lastname = "Initializer")')
+    cur = g.db.execute('select firstname, lastname, charity, about, email, hitcount, dob, post_title from entries order by id desc')
+    if not cur.fetchall():
+        g.db.execute('insert into entries (hitcount) values (?)', [0])
         g.db.commit()
-    else:
-        g.db.execute('insert into entries (firstname, lastname, hitcount) values (?, ?, ?)', ["Hitcount", "Initializer", 1])
-        g.db.commit()
-
 
 @app.teardown_request
 def teardown_request(exception):
@@ -50,8 +46,10 @@ def teardown_request(exception):
 # showing entries
 @app.route('/')
 def show_entries():
-    cur = g.db.execute('select firstname, lastname, charity, about, email from entries order by id desc')
-    entries = [dict(firstname=row[0], lastname=row[1], charity=row[2], about=row[3], email=row[4]) for row in cur.fetchall()]
+    g.db.execute('update entries set hitcount = hitcount + 1')
+    g.db.commit()
+    cur = g.db.execute('select firstname, lastname, charity, about, email, hitcount, dob, post_title from entries order by id desc')
+    entries = [dict(firstname=row[0], lastname=row[1], charity=row[2], about=row[3], email=row[4], hitcount=row[5], dob=row[6], post_title=row[7]) for row in cur.fetchall()]
     return render_template('show_entries.html', entries=entries)
 
 # adding new entry
@@ -59,8 +57,8 @@ def show_entries():
 def add_entry():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into entries (firstname, lastname, charity, about, email) values (?, ?, ?, ?, ?)',
-                 [request.form['firstname'], request.form['lastname'], request.form['charity'], request.form['about'], request.form['email']])
+    g.db.execute('insert into entries (firstname, lastname, charity, about, email, dob, post_title) values (?, ?, ?, ?, ?, ?, ?)',
+                 [request.form['firstname'], request.form['lastname'], request.form['charity'], request.form['about'], request.form['email'], request.form['dob'], request.form['post_title']])
     g.db.commit()
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
@@ -87,14 +85,23 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
+# entering info
+@app.route('/enter_info')
+def enter_info():
+    if not session.get('logged_in'):
+        abort(401)
+    return render_template('enter_info.html')
+
 # collaborator pages
 @app.route('/collaborator')
-def collaborator(entry_info):
+def collaborator():
     collaborator_info = None
-    cur = g.db.execute('select firstname, lastname, charity, about from entries order by id desc where (firstname <> "Hitcount") and (lastname <> "Initializer")')
-    entries = [dict(firstname=row[0], lastname=row[1], charity=row[2], about=row[3]) for row in cur.fetchall()]
+    coll_first = request.args.get('coll_first')
+    coll_last = request.args.get('coll_last')
+    cur = g.db.execute('select firstname, lastname, charity, about, email, dob from entries order by id desc')
+    entries = [dict(firstname=row[0], lastname=row[1], charity=row[2], about=row[3], email=row[4], dob=row[5]) for row in cur.fetchall()]
     for e in entries:
-        if e['firstname'] == entry_info['firstname'] and e['lastname'] == entry_info['lastname']:
+        if e['firstname'] == coll_first and e['lastname'] == coll_last:
             collaborator_info = e
             break
     return render_template('collaborator.html', collaborator_info=collaborator_info)

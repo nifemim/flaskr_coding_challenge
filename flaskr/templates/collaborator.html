@@ -1,17 +1,20 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% if collaborator_info %}
-  	<h2>{{ collaborator_info.firstname } { collaborator_info.lastname }}</h2>
-  	<br>
-  	<h3><strong>Affiliated Charity</strong>{{ collaborator_info.charity }}</h3>
-  	<br>
-  	<h3><strong>About</strong></h3>
-  	<p>{{ collaborator_info.about }}</p>
-  	<br>
-  	<h3><strong>Try contacting this possible collaborator by their email! </strong></h3>
-  	<p>{{ collaborator_info.email }}</p>
-  {% else %}
-  	<p class=error><strong>Error:</strong> It seems this collaborator isn't in our databse. Strange...
-  {% endif %}
-  
+  <div class="content">
+    <div>
+      {% if collaborator_info %}
+      	<h2 class="post-title">{{ collaborator_info.firstname }} {{ collaborator_info.lastname }}</h2>
+    		<h3 class="content-subhead">Date of Birth</h3>{{ collaborator_info.dob }}
+      	<h3 class="content-subhead">Affiliated Charity</h3>{{ collaborator_info.charity }}
+      	<h3 class="content-subhead">About</h3>
+      	<p>{{ collaborator_info.about }}</p>
+      	<h3 class="content-subhead">Contact Info</h3>
+      	<p>{{ collaborator_info.email }}</p>
+      {% else %}
+      	<p class=error><strong>Error:</strong> It seems this collaborator isn't in our databse. Strange...
+      {% endif %}
+
+      <a href="{{ url_for('show_entries') }}">Back to Homepage</a>
+    </div>
+  </div>
 {% endblock %}

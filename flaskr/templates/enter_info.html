@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block body %}
+	<div class="content">
+		<div>
+		{% if session.logged_in %}
+			<form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+			<dl>
+			<fieldset>
+				<legend class="content-subhead">Personal Information</legend>
+				<dt> First Name:
+				<dd><input type="text" name="firstname">
+				<dt> Last Name:
+				<dd><input type="text" name="lastname">
+				<dt> Date of Birth:
+				<dd><input type="date" name="dob">
+				<dt> Email Adress:
+				<dd><input type="text" name="email">
+			</fieldset>
+			<br>
+			<fieldset>
+				<legend class="content-subhead">Charity Information</legend>
+				<dt> Affiliated Charity:
+				<dd><input type="radio" name="charity" value="Alzheimer's Association">Alzheimer's Association
+				<dd><input type="radio" name="charity" value="American Cancer Society">American Cancer Society
+				<dd><input type="radio" name="charity" value="American Red Cross">American Red Cross
+				<dt> Give this post on your charity work a title:
+				<dd><input type="text" name="post_title">
+				<dt> Write up a post on some of your chaarity work experience:
+				<dd><textarea name="about" rows="5" cols="40"></textarea>
+			</fieldset>
+			<br>
+			<dd><input type="submit" value="Share">
+			</dl>
+			</form>
+		{% endif %}
+		</div>
+	</div>
+
+{% endblock %}

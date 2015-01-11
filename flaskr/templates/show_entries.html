@@ -1,44 +1,68 @@
 {% extends "layout.html" %}
-{% block body %}
-  {% if session.logged_in %}
-    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-      <dl>
-        <fieldset>
-        <legend>Personal Information</legend>
-        <dt> First Name:
-        <dd><input type="text" name="firstname">
-        <dt> Last Name:
-        <dd><input type="text" name="lastname">
-        <dt> Email Adress:
-        <dd><input type="text" name="email">
-        </fieldset>
-        <br>
-        <fieldset>
-        <legend>Charity Information</legend>
-        <dt> Affiliated Charity:
-        <dd><input type="radio" name="charity" value="alzheimers">Alzheimer's Association
-        <dd><input type="radio" name="charity" value="cancersociety">American Cancer Society
-        <dd><input type="radio" name="charity" value="amredcross">American Red Cross
-        <dt> Tell Us About Your Charity Experience:
-        <dd><textarea name="about" rows="5" cols="40"></textarea>
-        </fieldset>
-        <br>
-        <dd><input type="submit" value="Share">
-      </dl>
-    </form>
-  {% endif %}
-  
-  {% for entry in entries %}
-    {% if entry.firstname = "Hitcounter" and entry.lastname = "Initializer" %}
-      <h2>Website Views So Far:</h2>{{ entry.hitcount }}
-    {% endif %}
-  {% endfor %}
 
-  <ul class="entries">
-  {% for entry in entries %}
-    {% if entry.firstname != "Hitcounter" and entry.lastname != "Initializer" %}
-      <li><h2><a href="{{ url_for('collaborator', entry) }}"> {{ entry.firstname } { entry.lastname }} </a></h2>{{entry.charity}}
-    {% endif %}
-  {% endfor %}
-  </ul>
+{% block hitcount %}
+	{% for entry in entries %}
+		{% if entry.hitcount %}
+			Homepage Views So Far: <bold>{{ entry.hitcount }}</bold>
+		{% endif %}
+	{% endfor %}
+{% endblock %}
+
+{% block body %}
+	<div class="content">
+		<div>
+		{% for message in get_flashed_messages() %}
+			<div class=flash>{{ message }}</div>
+		{% endfor %}
+		<!-- A wrapper for all the blog posts -->
+			<div class="posts">
+				<h1 class="content-subhead">Most Recent Post</h1>
+				<!-- A single blog post -->
+				{% if not entries[0].hitcount %}
+					<section class="post">
+						<header class="post-header">
+							<h2 class="post-title">{{ entries[0].post_title }}</h2>
+							<p class="post-meta">
+								By <a href="{{ url_for('collaborator', coll_first=entries[0].firstname, coll_last=entries[0].lastname) }}" class="post-author"> {{ entries[0].firstname }} {{ entries[0].lastname }} </a> under
+								{% if entries[0].charity == "American Red Cross" %}<a class="post-category post-category-arc">
+								{% else %}<a>
+								{% endif %}
+								{{ entries[0].charity }}</a>
+							</p>
+						</header>
+
+						<div class="post-description">
+							<p>{{ entries[0].about }}</p>
+						</div>
+					</section>
+				{% endif %}
+			</div>
+
+			<div class="posts">
+				<h1 class="content-subhead">Past Posts</h1>
+				{% for entry in entries %}
+					{% if entry != entries[0] and not entry.hitcount %}
+						<section class="post">
+							<header class="post-header">
+								<h2 class="post-title">{{ entry.post_title }}</h2>
+								<p class="post-meta">
+									By <a href="{{ url_for('collaborator', coll_first=entry.firstname, coll_last=entry.lastname) }}" class="post-author"> {{ entry.firstname }} {{ entry.lastname }} </a> under
+									{% if entry.charity == "American Cancer Society" %}<a class="post-category post-category-acs">
+									{% endif %}
+									{% if entry.charity == "American Red Cross" %}<a class="post-category post-category-arc">
+									{% endif %}
+									{% if entry.charity == "Alzheimer's Association" %}<a class="post-category post-category-aa">
+									{% endif %}
+									{{ entry.charity }}</a>
+								</p>
+							</header>
+							<div class="post-description">
+								<p>{{ entry.about }}</p>
+							</div>
+						</section>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+	</div>
 {% endblock %}
