@@ -1,6 +1,12 @@
 flaskr_coding_challenge
 =======================
-To run, cd into the flaskr directory and type "python flaskr.py". A local address will be provided in the terminal which you can then click to be taken to the main page.
+First you will need to cd into the flaskr directory and pipe the schema.sql file into the sqlite3 command to actually create our database. This can be done using:
+
+sqlite3 /tmp/flaskr.db < schema.sql 
+
+(Note that the path can be changed to fit where your files are stored)
+
+To run, from the flaskr directory and type "python flaskr.py". A local address will be provided in the terminal which you can then click to be taken to the main page.
 
 You will need to log in using the login 'admin' and password 'default'.
 
